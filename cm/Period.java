@@ -3,14 +3,16 @@ package cm;
 import java.util.List;
 
 public class Period {
-     private int startHour;
-     private int endHour;
+    // Made fields final to ensure immutability
+    private final int startHour;
+    private final int endHour;
 
     public Period(int start, int end) {
         if (start >= end) {
             throw new IllegalArgumentException("start of period cannot be later or equal to end of period");
         }
-        if (start < 0 || start > 24 || end < 0 || end > 24) {
+        // Simplified condition to remove 'end < 0'
+        if (start < 0 || start > 24 || end > 24) {
             throw new IllegalArgumentException("start of period and end of period must be between 0 and 24");
         }
         this.startHour = start;
@@ -23,11 +25,13 @@ public class Period {
      * @return true if the hour is within the period
      */
     private Boolean isIn(int hour) {
-        return hour >= this.startHour && hour < this.endHour;
+        // Made hour < this.endHour to include the endHour (hour <= this.endHour)
+        return hour >= this.startHour && hour <= this.endHour;
     }
 
     private static Boolean isIn(int hour, List<Period> list) {
-        Boolean isIn = false;
+        // Updated from Boolean to boolean. Use primitive type.
+        boolean isIn = false;
         int i = 0;
         while (i < list.size() && !isIn) {
             isIn = list.get(i).isIn(hour);

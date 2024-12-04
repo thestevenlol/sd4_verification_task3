@@ -6,8 +6,9 @@ import java.util.List;
 
 public class Rate {
     private CarParkKind kind;
-    private BigDecimal hourlyNormalRate;
-    private BigDecimal hourlyReducedRate;
+    // Made hourlyNormalRate and hourlyReducedRate final to ensure immutability
+    private final BigDecimal hourlyNormalRate;
+    private final BigDecimal hourlyReducedRate;
     private ArrayList<Period> reduced = new ArrayList<>();
     private ArrayList<Period> normal = new ArrayList<>();
 
@@ -20,6 +21,11 @@ public class Rate {
         }
         if (normalRate.compareTo(BigDecimal.ZERO) < 0 || reducedRate.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("A rate cannot be negative");
+        }
+        // Additional constraint to ensure less than 10 as per the requirement:
+        // the normalRate and reducedRate are greater or equal to 0 but less or equal to 10
+        if (normalRate.compareTo(BigDecimal.TEN) > 0 || reducedRate.compareTo(BigDecimal.TEN) > 0) {
+            throw new IllegalArgumentException("The rates cannot be greater than 10");
         }
         if (normalRate.compareTo(reducedRate) <= 0) {
             throw new IllegalArgumentException("The normal rate cannot be less or equal to the reduced rate");
@@ -61,7 +67,7 @@ public class Rate {
     private Boolean isValidPeriods(ArrayList<Period> list) {
         Boolean isValid = true;
         if (list.size() >= 2) {
-            Period secondPeriod;
+            // Removed secondPeriod: it was never used.
             int i = 0;
             int lastIndex = list.size()-1;
             while (i < lastIndex && isValid) {
@@ -79,7 +85,8 @@ public class Rate {
      * @return true if the period does not overlap in the collecton of periods
      */
     private Boolean isValidPeriod(Period period, List<Period> list) {
-        Boolean isValid = true;
+        // Changed Boolean to boolean. Use primitive type.
+        boolean isValid = true;
         int i = 0;
         while (i < list.size() && isValid) {
             isValid = !period.overlaps(list.get(i));
@@ -90,7 +97,7 @@ public class Rate {
     public BigDecimal calculate(Period periodStay) {
         int normalRateHours = periodStay.occurences(normal);
         int reducedRateHours = periodStay.occurences(reduced);
-        if (this.kind==CarParkKind.VISITOR) return BigDecimal.valueOf(0);
+        // Removed free visitor charge, this is not mentioned in the specification.
         return (this.hourlyNormalRate.multiply(BigDecimal.valueOf(normalRateHours))).add(
                 this.hourlyReducedRate.multiply(BigDecimal.valueOf(reducedRateHours)));
     }
